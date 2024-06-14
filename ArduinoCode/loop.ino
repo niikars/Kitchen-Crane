@@ -141,8 +141,8 @@ void loop()
         }
         else
         {
-          digitalWrite(V_Cold, CLOSED);
           digitalWrite(V_Cr, OPEN);
+          digitalWrite(V_Cold, CLOSED);
         }
       }
       // вода включена 
@@ -156,8 +156,8 @@ void loop()
         }
         else
         {
-          digitalWrite(V_Cold, CLOSED);
           digitalWrite(V_Cr, OPEN);
+          digitalWrite(V_Cold, CLOSED);
         }
       }
       //иначе всё выключаем
@@ -216,9 +216,9 @@ void loop()
       //иначе, если состояние питьевая, 
       else if (State_Dr)
       {
-        digitalWrite(V_FDr, CLOSED);
         //то включаем канал "питьевая"
         digitalWrite(V_Dr, OPEN);
+        digitalWrite(V_FDr, CLOSED);
         //!?выключаем питание сенсора
         //!?digitalWrite(S_Dr_5, LOW);  
       }
