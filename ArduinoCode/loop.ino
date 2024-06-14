@@ -3,7 +3,7 @@ Kitchen Crane main loop by Nikolay Krasilnikov
 created 14-01-2024
 updated 20.01.2024-21.01.2024 25.01.2024 27.01.2024 04.02.2024 04.03.2024
         08.03.2024 14.03.2024-18.03.2024 04.04.2024 06.04.2024 31.05.2024
-        02.06.2024-03.06.2024
+        02.06.2024-03.06.2024 14.06.2024
 */
 
 void loop() 
@@ -101,11 +101,21 @@ void loop()
     {
       mi_12 += MAIN_TOUT;
 //КУХОННЫЙ КРАН
+
       //Если было удержание крана более некоторого времени и кран отпущен,
       // то включаем / выключаем режим вода
       SCr = digitalRead(S_Cr);
       if (State_S_Crane)
       {
+        // Если было касание, кран удерживается и прошло времени больше MIN_TUCH_TOUT,
+        // то зажигаем или гасим светодиод в зависимости от состояния State_Cr,
+        // показывая этим, что отпускание крана приведёт к изменению состояния.
+        if ( (SCr == HIGH) 
+             && ((curMi - mi_S_Cr) >  MIN_TUCH_TOUT)
+             && ((curMi - mi_S_Cr) <  TUCH_TOUT))
+        {
+          digitalWrite(D_Cr, (!State_Cr)?HIGH:LOW);
+        }
         // если удерживался менее MIN_TUCH_TOUT, или уже более TUCH_TOUT, то отменяем касание
         if ( ((SCr == LOW) && ((curMi - mi_S_Cr) <  MIN_TUCH_TOUT))
           || ((SCr == HIGH) && ((curMi - mi_S_Cr) >  TUCH_TOUT)))
@@ -163,6 +173,19 @@ void loop()
       if (State_Cr & !State_S_Crane)   digitalWrite(D_Cr, HIGH);
 
 //ПИТЬЕВАЯ 
+      //Если полный напор и было касание крана и кран удерживается,
+      //то переходим к обычному напору от касания крана
+      if (State_S_Dr && State_FDr)
+      {
+        if (digitalRead(S_Dr) == HIGH) 
+        {
+          digitalWrite(V_FDr, CLOSED);
+          digitalWrite(D_FDr, LOW);
+          State_V_Dr = true;
+          State_FDr = false;
+          State_Dr = false;
+        }
+      }
       //Если было касание крана и вода не включена,
       // то включаем воду, если кран удерживается
       if (State_S_Dr && !State_Dr)

@@ -3,7 +3,7 @@ Interrupts functions for Kitchen Crane by Nikolay Krasilnikov
 created 14-01-2024
 updated 20.01.2024-21.01.2024 25.01.2024 27.01.2024 04.02.2024 04.03.2024
         08.03.2024 14.03.2024-18.03.2024 04.04.2024 06.04.2024 31.05.2024
-        02.06.2024-03.06.2024
+        02.06.2024-03.06.2024 14.06.2024
 */
 
 // функция прерывания по нажатию одной из кнопок
@@ -183,7 +183,7 @@ void SensorDr()
 // функция прерывания по касанию сенсора кухонного крана.
 void SensorCr()
 {
-  if (Starting || (mi_12 < MAIN_TOUT)) return;
+  if (Starting || (mi_12 < MAIN_TOUT) || State_V_Dr) return;
   IntSensorCrane =  (char *)IntSensorCrane_s;
   delayMicroseconds(BOUNCE);
   int SCr = digitalRead(S_Cr);
@@ -194,8 +194,10 @@ void SensorCr()
     if (SCr == HIGH)
     {
       State_S_Crane = true;
-      // Зажигаем или гасим светодиод в зависимости от состояния State_Cr 
-      digitalWrite(D_Cr, (!State_Cr)?HIGH:LOW);
+      // Зажигаем или гасим светодиод в зависимости от состояния State_Cr,
+      // тольов том случае, если минимальное время касания превышено
+      // и отпускание крана приведёт к изменению состояния
+      //digitalWrite(D_Cr, (!State_Cr)?HIGH:LOW);
       // Запоминаем время касания, чтобы включить или выключить воду,
       // только в случае касания некоторой длительности.
       mi_S_Cr = millis(); 
